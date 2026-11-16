@@ -68,6 +68,7 @@ async function captureFirstTool(tool: Tool): Promise<NonNullable<AnthropicToolPa
 }
 
 describe("Anthropic strict tool schemas", () => {
+	// https://github.com/earendil-works/pi/issues/12212
 	it("keeps the declared dialect for non-strict Draft 7 tuple schemas", async () => {
 		const parameters = {
 			$schema: "http://json-schema.org/draft-07/schema#",
