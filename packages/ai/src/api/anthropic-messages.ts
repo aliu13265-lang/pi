@@ -1902,16 +1902,19 @@ function convertTools(
 				: resolveJsonSchemaStrictSampling(tool, supportsStrictTools, isAnthropicStrictUnsupportedKeyword);
 		const parameters = getJsonSchemaToolParameters(tool, strict);
 		const schema = parameters as {
+			$schema?: string;
 			properties?: unknown;
 			required?: string[];
 			additionalProperties?: unknown;
 			$defs?: unknown;
 			definitions?: unknown;
 		};
+		// Keep the dialect so Draft 7 tuple items are not interpreted as a newer schema dialect.
 		// Keep shared definitions so property $refs still resolve, and additionalProperties so the
 		// model knows whether extra arguments are allowed. Other root keywords stay out:
 		// Anthropic rejects root anyOf/oneOf/allOf with a 400.
 		const legacyInputSchema = {
+			...(schema.$schema === undefined ? {} : { $schema: schema.$schema }),
 			type: "object" as const,
 			properties: schema.properties ?? {},
 			required: schema.required ?? [],

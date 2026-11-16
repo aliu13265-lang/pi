@@ -68,6 +68,25 @@ async function captureFirstTool(tool: Tool): Promise<NonNullable<AnthropicToolPa
 }
 
 describe("Anthropic strict tool schemas", () => {
+	it("keeps the declared dialect for non-strict Draft 7 tuple schemas", async () => {
+		const parameters = {
+			$schema: "http://json-schema.org/draft-07/schema#",
+			type: "object",
+			properties: {
+				pair: {
+					type: "array",
+					items: [{ type: "string" }, { type: "string" }],
+					minItems: 2,
+					maxItems: 2,
+				},
+			},
+			required: ["pair"],
+		} as unknown as Tool["parameters"];
+		const tool = await captureFirstTool(createTool(parameters));
+		expect(tool.strict).toBeUndefined();
+		expect(tool.input_schema).toEqual(parameters);
+	});
+
 	it("only sends the full input schema for strict JSON-schema tools", async () => {
 		const legacyParameters = Type.Object(
 			{ value: Type.String() },
